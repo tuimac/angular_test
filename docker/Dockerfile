@@ -1,15 +1,23 @@
 FROM centos:latest
 
+EXPOSE 80
+
+ARG url=https://github.com/tuimac/boringweb.git
 WORKDIR /root
 
 ADD env/bashrc /root/.bashrc
 ADD env/login_screen /root/.login_screen
 ADD env/centos/vim.sh /etc/profile.d/vim.sh
+ADD requirements.txt /root/requirements.txt
 
 RUN yum update -y && \
-    yum install -y iproute curl unzip git tree vim* nodejs && \
+    yum install -y iproute curl unzip git tree vim* nodejs python3 && \
     mkdir -p /etc/vim/backup && \
     mkdir -p /etc/vim/undo && \
-    rm anaconda-ks.cfg anaconda-post.log original-ks.cfg
+    npm install -g @angular/cli && \
+    pip3 install -r requirements.txt && \
+    rm anaconda-ks.cfg anaconda-post.log original-ks.cfg requirements.txt && \
+    git clone $url
     
 ADD env/vimrc /etc/vim/vimrc
+WORKDIR /root/boringweb

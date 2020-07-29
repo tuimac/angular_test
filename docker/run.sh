@@ -2,22 +2,20 @@
 
 # Change variables below if you need
 ##############################
-NAME="angular"
-VOLUME="${PWD}/volume"
-DOCKERHUBUSER="tuimac"
+NAME='boringweb'
+VOLUME=${PWD}/volume
+DOCKERHUBUSER='tuimac'
 IMAGE=${DOCKERHUBUSER}/${NAME}
 ##############################
 
 function runContainer(){
     docker run -itd --name ${NAME} \
                 -h ${NAME} \
-                -v "${VOLUME}:/tmp" \
-                -v "/etc/localtime:/etc/localtime:ro" \
-                -p "8080:80" \
-                -p "3000:3000" \
-                -p "3001:3001" \
-                --network="br0" \
-                ${IMAGE} /bin/bash
+                -v ${VOLUME}:/tmp \
+                -v /etc/localtime:/etc/localtime:ro \
+                -p 4000:80 \
+                --network=bridge \
+                ${NAME}
 }
 
 function cleanup(){
@@ -27,12 +25,17 @@ function cleanup(){
 
 function createContainer(){
     mkdir ${VOLUME}
-    docker build -t ${IMAGE} .
+    docker build -t ${NAME} .
     runContainer
     cleanup
 }
 
 function rerunContainer(){
+    echo -en 'Do you want to commit image? [y(default)/n]: '
+    read answer
+    if [ '$answer' != 'n' ]; then
+        commitImage ${NAME}
+    fi
     docker stop ${NAME}
     docker rm ${NAME}
     runContainer
@@ -42,18 +45,19 @@ function rerunContainer(){
 function deleteAll(){
     docker stop ${NAME}
     docker rm ${NAME}
-    docker rmi ${IMAGE}
+    docker rmi ${NAME}
     cleanup
     rm -rf ${VOLUME}
 }
 
 function commitImage(){
     docker stop ${NAME}
-    docker commit ${NAME} ${IMAGE}
+    docker commit ${NAME} $1
     docker start ${NAME}
 }
 
 function pushImage(){
+    commitImage ${IMAGE}
     docker push ${IMAGE}
     if [ $? -ne 0 ]; then
         cat .password.txt | base64 -d | docker login --username ${DOCKERHUBUSER} --password-stdin
@@ -62,30 +66,37 @@ function pushImage(){
         fi
         docker push ${IMAGE}
     fi
+    docker rmi ${IMAGE}
+    cleanup
 }
 
 function registerSecret(){
-        if [ -e .password.txt ]; then
-        echo -en "There is '.password.txt' file in your current directory."
-        echo -en "Continue this? [y/n]: "
+    local secretFile='.password.txt'
+    if [ -e $secretFile ]; then
+        echo -en 'There is '.password.txt' file in your current directory.'
+        echo -en 'Continue this? [y/n]: '
         read answer
-        if [ $answer == "n" ]; then
-            echo "Registering password is skipped."
+        if [ $answer == 'n' ]; then
+            echo 'Registering password is skipped.'
             exit 0
+        elif [ $answer == 'y' ]; then
+            echo '' > /dev/null
         else
-            echo "Only type in 'y' or 'n'."
+            echo 'Only type in 'y' or 'n'.'
             exit 1
         fi
-        fi
-        echo -en "Password: "
-        read -s password
-        echo
-        echo $password | base64 > .password.txt
+    fi
+    echo -en 'Password: '
+    read -s password
+    echo
+    chmod 600 ${secretFile}
+    echo $password | base64 > ${secretFile}
+    chmod 400 ${secretFile}
 }
 
 function userguide(){
-    echo -e "usage: ./run.sh [help | create | delete | commit | register-secret]"
-    echo -e "
+    echo -e 'usage: ./run.sh [help | create | delete | commit | register-secret]'
+    echo -e '
 optional arguments:
 create              Create image and container after that run the container.
 rerun               Delete only container and rerun container with new settings.
@@ -93,24 +104,24 @@ delete              Delete image and container.
 commit              Create image from target container and push the image to remote repository.
 push                Push image you create to Docker Hub.
 register-secret     Create password.txt for make it login process within 'commit' operation.
-    "
+    '
 }
 
 function main(){
     [[ -z $1 ]] && { userguide; exit 1; }
-    if [ $1 == "create" ]; then
+    if [ $1 == 'create' ]; then
         createContainer
-    elif [ $1 == "rerun" ]; then
+    elif [ $1 == 'rerun' ]; then
         rerunContainer
-    elif [ $1 == "delete" ]; then
+    elif [ $1 == 'delete' ]; then
         deleteAll
-    elif [ $1 == "commit" ]; then
-        commitImage
-    elif [ $1 == "push" ]; then
+    elif [ $1 == 'commit' ]; then
+        commitImage ${NAME}
+    elif [ $1 == 'push' ]; then
         pushImage
-    elif [ $1 == "help" ]; then
+    elif [ $1 == 'help' ]; then
         userguide
-    elif [ $1 == "register-secret" ]; then
+    elif [ $1 == 'register-secret' ]; then
         registerSecret
     else
         { userguide; exit 1; }
