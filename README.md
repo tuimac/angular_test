@@ -2,9 +2,9 @@
 
 I just try to create simple web system because enhance my skills for web development.
 
-Front-end framework: AngularJS
-Back-end framework: Django REST framework
-Database: MySQL
+Front-end framework: AngularJS  
+Back-end framework: Django REST framework  
+Database: MySQL  
 
 ## Support
 
