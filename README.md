@@ -3,7 +3,7 @@
 I just try to create simple web system because enhance my skills for web development.
 
 Front-end framework: AngularJS  
-Back-end framework: Django REST framework  
+Back-end framework: Node.js Express  
 Database: MySQL  
 
 ## Support
