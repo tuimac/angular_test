@@ -2,8 +2,8 @@
 
 # Change variables below if you need
 ##############################
-NAME='simpleweb'
-VOLUME=${PWD}/volume
+NAME='db_simpleweb'
+VOLUME='${PWD}/volume'
 DOCKERHUBUSER='tuimac'
 IMAGE=${DOCKERHUBUSER}/${NAME}
 ##############################
@@ -11,11 +11,13 @@ IMAGE=${DOCKERHUBUSER}/${NAME}
 function runContainer(){
     docker run -itd --name ${NAME} \
                 -h ${NAME} \
-                -v ${VOLUME}:/tmp \
-                -v /etc/localtime:/etc/localtime:ro \
-                -p 4200:4200 \
-                -p 4000:80 \
-                --network=bridge \
+                -v '${VOLUME}:/var/log/mysql' \
+                -v '/etc/localtime:/etc/localtime:ro' \
+                -e 'MYSQL_USER: test' \
+                -e 'MYSQL_ROOT_PASSWORD: password' \
+                -e 'MYSQL_PASSWORD: password' \
+                -e 'MYSQL_DATABASE: simpleweb' \
+                --network='bridge' \
                 ${NAME}
 }
 
