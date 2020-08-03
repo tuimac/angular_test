@@ -3,7 +3,7 @@
 GITUSERNAME="tuimac"
 BRANCH="master"
 GITEMAIL="tuimac.devadm01@gmail.com"
-REPOURL="https://github.com/tuimac/boringweb.git"
+REPOURL="https://github.com/tuimac/simpleweb.git"
 
 function checkArg(){
     [[ "$1" = "" ]] && { echo -e "Select files.\nExit."; exit 1; }

@@ -2,7 +2,7 @@
 
 # Change variables below if you need
 ##############################
-NAME='boringweb'
+NAME='simpleweb'
 VOLUME=${PWD}/volume
 DOCKERHUBUSER='tuimac'
 IMAGE=${DOCKERHUBUSER}/${NAME}
@@ -13,6 +13,7 @@ function runContainer(){
                 -h ${NAME} \
                 -v ${VOLUME}:/tmp \
                 -v /etc/localtime:/etc/localtime:ro \
+                -p 4200:4200 \
                 -p 4000:80 \
                 --network=bridge \
                 ${NAME}
