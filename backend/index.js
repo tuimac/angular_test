@@ -9,7 +9,6 @@ var htmlPath = path.join(__dirname, '..', 'frontend', 'index.html');
 
 function responseView(res, statuscode, message) {
   if (typeof message == 'object') {
-    console.log('hello');
     res.end(message);
   } else {
     res.writeHead(statuscode, {'Content-Type': 'text/plain'});
@@ -21,14 +20,20 @@ function responseView(res, statuscode, message) {
 function main() {
   http.createServer(function (req, res) {
     if (req.method == 'POST') {
-      let body = '';
-      req.on('data', chunk => {
-        body += chunk.toString();
-      });
-      req.on('end', () => {
-        res.end('ok');
-      });
-      responseView(res, 200, 'Your input is ' + body + '.');
+      if (req.url == '/api') {
+        let body = '';
+        req.on('data', chunk => {
+          body += chunk.toString();
+        });
+        /*
+        req.on('end', () => {
+          res.end('ok');
+        });*/
+        console.log(body)
+        responseView(res, 200, 'Your input is ' + body + '.');
+      } else {
+        responseView(res, 404, 'Not found.');
+      }
     } else if (req.method == 'GET') {
       if (req.url == '/') {
         fs.readFile(htmlPath, function(err, html) {
@@ -38,7 +43,7 @@ function main() {
           responseView(res, 200, html);
         });
       } else {
-        responseView(res, 200, 'Access to http://localhost:' + port + '/');
+        responseView(res, 200, 'Access to http://<host IP address>:' + port + '/');
       }
     } else {
       responseView(res, 405, 'Method(' + req.method + ') is not allowed!!!');
