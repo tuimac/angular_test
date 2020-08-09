@@ -1,15 +1,21 @@
 #!/usr/bin/env node
 
 var http = require('http'),
-    fs = require('fs');
+    fs = require('fs'),
+    path = require('path');
 
 var port = 8000;
-var htmlPath = '../frontend/index.html';
+var htmlPath = path.join(__dirname, '..', 'frontend', 'index.html');
 
 function responseView(res, statuscode, message) {
-  res.writeHead(statuscode, {'Content-Type': 'text/plain'});
-  res.write(message);
-  res.end();
+  if (typeof message == 'object') {
+    console.log('hello');
+    res.end(message);
+  } else {
+    res.writeHead(statuscode, {'Content-Type': 'text/plain'});
+    res.write(message);
+    res.end();
+  }
 }
 
 function main() {
