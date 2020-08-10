@@ -5,7 +5,7 @@ var http = require('http'),
     path = require('path');
 
 var port = 8000;
-var htmlPath = path.join(__dirname, '..', 'frontend', 'index.html');
+var htmlPath = path.join(__dirname, 'index.html');
 
 function responseView(res, statuscode, message) {
   if (typeof message == 'object') {
@@ -33,9 +33,9 @@ function main() {
       }
     } else if (req.method == 'GET') {
       if (req.url == '/') {
-        fs.readFile(htmlPath, function(err, html) {
+        fs.readFile(htmlPath, (err, html) => {
           if (err) {
-            throw err;
+            responseView(res, 200, 'Throw POST data to http://<host IP address>:' + port + '/api');
           }
           responseView(res, 200, html);
         });
