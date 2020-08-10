@@ -25,12 +25,9 @@ function main() {
         req.on('data', chunk => {
           body += chunk.toString();
         });
-        /*
         req.on('end', () => {
-          res.end('ok');
-        });*/
-        console.log(body)
-        responseView(res, 200, 'Your input is ' + body + '.');
+          responseView(res, 200, 'Your input is ' + body + '.'); 
+        });
       } else {
         responseView(res, 404, 'Not found.');
       }
