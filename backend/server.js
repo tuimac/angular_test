@@ -26,7 +26,7 @@ function main() {
           body += chunk.toString();
         });
         req.on('end', () => {
-          responseView(res, 200, 'Your input is ' + body + '.'); 
+          responseView(res, 200, 'Your input is ' + body + '.');
         });
       } else {
         responseView(res, 404, 'Not found.');
@@ -42,6 +42,14 @@ function main() {
       } else {
         responseView(res, 200, 'Access to http://<host IP address>:' + port + '/');
       }
+    } else if (req.method == 'OPTIONS') {
+      res.writeHead(statuscode, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Request-Headers': 'Content-Type'
+      });
+      res.write();
+      res.end();
     } else {
       responseView(res, 405, 'Method(' + req.method + ') is not allowed!!!');
     }
@@ -53,3 +61,4 @@ if (require.main === module) {
 } else {
   console.log('This is not module!!');
 }
+
