@@ -2,7 +2,7 @@
 
 # Change variables below if you need
 ##############################
-NAME=db_simpleweb
+NAME=backend_simpleweb
 VOLUME=${PWD}/volume
 DOCKERHUBUSER=tuimac
 IMAGE=${DOCKERHUBUSER}/${NAME}
@@ -11,14 +11,10 @@ IMAGE=${DOCKERHUBUSER}/${NAME}
 function runContainer(){
     docker run -itd --name ${NAME} \
                 -h ${NAME} \
-                -v ${VOLUME}:/var/log/mysql \
+                -v ${VOLUME}:/tmp \
                 -v /etc/localtime:/etc/localtime:ro \
-                -e MYSQL_USER=simpleweb \
-                -e MYSQL_PASSWORD=password \
-                -e MYSQL_ROOT_PASSWORD=password \
-                -e MYSQL_ALLOW_EMPTY_PASSWORD=no \
-                -e MYSQL_RANDOM_ROOT_PASSWORD=no \
-                -e MYSQL_DATABASE=simpleweb \
+                -p 4000:8080 \
+                --link db_simpleweb \
                 --network=br0 \
                 ${NAME}
 }
@@ -36,9 +32,9 @@ function createContainer(){
 }
 
 function rerunContainer(){
-    echo -en 'Do you want to commit image? [y(default)/n]: '
+    echo -en "Do you want to commit image? [y(default)/n]: "
     read answer
-    if [ '$answer' != 'n' ]; then
+    if [ "$answer" != "n" ]; then
         commitImage ${NAME}
     fi
     docker stop ${NAME}
@@ -76,22 +72,22 @@ function pushImage(){
 }
 
 function registerSecret(){
-    local secretFile='.password.txt'
+    local secretFile=".password.txt"
     if [ -e $secretFile ]; then
-        echo -en 'There is '.password.txt' file in your current directory.'
-        echo -en 'Continue this? [y/n]: '
+        echo -en "There is '.password.txt' file in your current directory."
+        echo -en "Continue this? [y/n]: "
         read answer
-        if [ $answer == 'n' ]; then
-            echo 'Registering password is skipped.'
+        if [ $answer == "n" ]; then
+            echo "Registering password is skipped."
             exit 0
-        elif [ $answer == 'y' ]; then
-            echo '' > /dev/null
+        elif [ $answer == "y" ]; then
+            echo "" > /dev/null
         else
-            echo 'Only type in 'y' or 'n'.'
+            echo "Only type in 'y' or 'n'."
             exit 1
         fi
     fi
-    echo -en 'Password: '
+    echo -en "Password: "
     read -s password
     echo
     chmod 600 ${secretFile}
@@ -100,8 +96,8 @@ function registerSecret(){
 }
 
 function userguide(){
-    echo -e 'usage: ./run.sh [help | create | delete | commit | register-secret]'
-    echo -e '
+    echo -e "usage: ./run.sh [help | create | delete | commit | register-secret]"
+    echo -e "
 optional arguments:
 create              Create image and container after that run the container.
 rerun               Delete only container and rerun container with new settings.
@@ -109,24 +105,24 @@ delete              Delete image and container.
 commit              Create image from target container and push the image to remote repository.
 push                Push image you create to Docker Hub.
 register-secret     Create password.txt for make it login process within 'commit' operation.
-    '
+    "
 }
 
 function main(){
     [[ -z $1 ]] && { userguide; exit 1; }
-    if [ $1 == 'create' ]; then
+    if [ $1 == "create" ]; then
         createContainer
-    elif [ $1 == 'rerun' ]; then
+    elif [ $1 == "rerun" ]; then
         rerunContainer
-    elif [ $1 == 'delete' ]; then
+    elif [ $1 == "delete" ]; then
         deleteAll
-    elif [ $1 == 'commit' ]; then
+    elif [ $1 == "commit" ]; then
         commitImage ${NAME}
-    elif [ $1 == 'push' ]; then
+    elif [ $1 == "push" ]; then
         pushImage
-    elif [ $1 == 'help' ]; then
+    elif [ $1 == "help" ]; then
         userguide
-    elif [ $1 == 'register-secret' ]; then
+    elif [ $1 == "register-secret" ]; then
         registerSecret
     else
         { userguide; exit 1; }

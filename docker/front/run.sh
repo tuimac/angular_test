@@ -2,19 +2,20 @@
 
 # Change variables below if you need
 ##############################
-NAME="api_simpleweb"
-VOLUME="${PWD}/volume"
-DOCKERHUBUSER="tuimac"
+NAME=front_simpleweb
+VOLUME=${PWD}/volume
+DOCKERHUBUSER=tuimac
 IMAGE=${DOCKERHUBUSER}/${NAME}
 ##############################
 
 function runContainer(){
     docker run -itd --name ${NAME} \
                 -h ${NAME} \
-                -v "${VOLUME}:/tmp" \
-                -v "/etc/localtime:/etc/localtime:ro" \
-                -p "8000:8000" \
-                --network="bridge" \
+                -v ${VOLUME}:/tmp \
+                -v /etc/localtime:/etc/localtime:ro \
+                -p 4200:80 \
+                --link backend_simpleweb \
+                --network=br0 \
                 ${NAME}
 }
 
