@@ -2,7 +2,7 @@
 
 # Change variables below if you need
 ##############################
-NAME=backend_simpleweb
+NAME=tomcat
 VOLUME=${PWD}/volume
 DOCKERHUBUSER=tuimac
 IMAGE=${DOCKERHUBUSER}/${NAME}
@@ -12,9 +12,8 @@ function runContainer(){
     docker run -itd --name ${NAME} \
                 -h ${NAME} \
                 -v ${VOLUME}:/tmp \
-                -v /etc/localtime:/etc/localtime:ro \
                 -p 4000:8080 \
-                --link db_simpleweb \
+                --link mysql \
                 --network=br0 \
                 ${NAME}
 }
