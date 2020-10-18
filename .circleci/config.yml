@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build:
+    build_dir: api
     machine:
       image: circleci/classic:edge
     steps:
