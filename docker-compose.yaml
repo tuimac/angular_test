@@ -1,0 +1,67 @@
+version: '3'
+services:
+  nginx:
+    build: ./nginx
+    hostname: nginx
+    container_name: nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - './nginx/volume:/var/www/html'
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf'
+    tty: true
+    stdin_open: true
+    networks:
+      simpleweb:
+        ipv4_address: 10.10.0.2
+    extra_hosts:
+      - 'nginx: 10.10.0.2'
+      - 'nodejs: 10.10.0.3'
+      - 'mysql: 10.10.0.4'
+  nodejs:
+    build: ./nodejs
+    hostname: nodejs
+    container_name: nodejs
+    ports:
+      - '8000:8000'
+    volumes:
+      - './nodejs/volume:/tmp'
+    tty: true
+    stdin_open: true
+    networks:
+      simpleweb:
+        ipv4_address: 10.10.0.3
+    extra_hosts:
+      - 'nginx: 10.10.0.2'
+      - 'nodejs: 10.10.0.3'
+      - 'mysql: 10.10.0.4'
+  mysql:
+    build: ./mysql
+    restart: always
+    hostname: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - './mysql/volume:/var/lib/mysql'
+    environment:
+      MYSQL_USER: test
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: test
+    tty: true
+    networks:
+      simpleweb:
+        ipv4_address: 10.10.0.4
+    extra_hosts:
+      - 'nginx: 10.10.0.2'
+      - 'nodejs: 10.10.0.3'
+      - 'mysql: 10.10.0.4'
+networks:
+  simpleweb:
+    name: simpleweb
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.0.0/24

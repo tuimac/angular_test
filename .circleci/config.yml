@@ -1,0 +1,30 @@
+on: 2
+jobs:
+  build:
+    machine:
+      image: circleci/classic:edge
+    steps:
+      - checkout
+      - run:
+          name: Install Docker Compose
+          command: |
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+      - run:
+          name: docker-compose up
+          command: |
+            set -x
+            docker-compose up --build -d
+      - run:
+          name: docker-compose stop
+          command: |
+            set -x
+            docker-compose stop
+      - run:
+          name: docker-compose up
+          command: |
+            set -x
+            docker-compose up -d
+      - run:
+          name: docker-compose down
+          command: docker-compose down
