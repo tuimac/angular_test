@@ -1,5 +1,7 @@
 # Just Web development
 
+[![CircleCI](https://circleci.com/gh/tuimac/simpleweb.svg?style=svg)](https://circleci.com/gh/tuimac/simpleweb)
+
 I just try to create simple web system because enhance my skills for web development.
 
 Front-end framework: AngularJS  
